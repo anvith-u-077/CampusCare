@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusCare - Complaint Tracker</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="#">CampusCare</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item" id="home-nav">
+            <a class="nav-link" href="#">Home</a>
+          </li>
+          <li class="nav-item" id="complaints-nav">
+            <a class="nav-link" href="#">My Complaints</a>
+          </li>
+          <li class="nav-item" id="new-complaint-nav">
+            <a class="nav-link" href="#">New Complaint</a>
+          </li>
+          <li class="nav-item d-none" id="admin-nav">
+            <a class="nav-link" href="#">Admin Dashboard</a>
+          </li>
+        </ul>
+        <div class="d-flex">
+          <div class="navbar-text me-3" id="user-email"></div>
+          <button class="btn btn-outline-light" id="logout-btn">Logout</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Auth Container -->
+  <div class="container mt-5" id="auth-container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-4">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Login</h4>
+          </div>
+          <div class="card-body">
+            <form id="login-form">
+              <div class="mb-3">
+                <label for="login-email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="login-email" required>
+              </div>
+              <div class="mb-3">
+                <label for="login-password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="login-password" required>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Login</button>
+            </form>
+            <div class="text-center mt-3">
+              <p>Don't have an account? <a href="#" id="show-register">Register</a></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-3 d-none" id="register-card">
+          <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Register</h4>
+          </div>
+          <div class="card-body">
+            <form id="register-form">
+              <div class="mb-3">
+                <label for="register-name" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="register-name" required>
+              </div>
+              <div class="mb-3">
+                <label for="register-email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="register-email" required>
+              </div>
+              <div class="mb-3">
+                <label for="register-password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="register-password" required>
+              </div>
+              <div class="mb-3">
+                <label for="register-role" class="form-label">Role</label>
+                <select class="form-select" id="register-role" required>
+                  <option value="student">Student</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Register</button>
+            </form>
+            <div class="text-center mt-3">
+              <p>Already have an account? <a href="#" id="show-login">Login</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Container -->
+  <div class="container mt-4 d-none" id="main-container">
+    <!-- Home Page -->
+    <div id="home-page">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0">Welcome to CampusCare</h5>
+            </div>
+            <div class="card-body">
+              <p>CampusCare is your one-stop solution for reporting and tracking complaints related to hostel and mess facilities.</p>
+              <p>Submit your complaints easily and track their status in real-time.</p>
+              <div class="alert alert-info">
+                <strong>Quick Stats:</strong>
+                <div id="quick-stats" class="mt-2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0">Recent Activity</h5>
+            </div>
+            <div class="card-body">
+              <div id="recent-activity"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- My Complaints Page -->
+    <div id="complaints-page" class="d-none">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4>My Complaints</h4>
+        <button class="btn btn-primary" id="new-complaint-btn">
+          <i class="fas fa-plus me-2"></i>New Complaint
+        </button>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Category</th>
+                  <th>Description</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="complaints-table">
+                <!-- Complaints will be loaded here -->
+              </tbody>
+            </table>
+          </div>
+          <div class="d-flex justify-content-center mt-3">
+            <nav>
+              <ul class="pagination" id="pagination">
+                <!-- Pagination will be added here -->
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Complaint Page -->
+    <div id="new-complaint-page" class="d-none">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="card">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0">New Complaint</h5>
+            </div>
+            <div class="card-body">
+              <form id="complaint-form">
+                <div class="mb-3">
+                  <label for="complaint-category" class="form-label">Category</label>
+                  <select class="form-select" id="complaint-category" required>
+                    <option value="">Select a category</option>
+                    <option value="Hostel">Hostel</option>
+                    <option value="Mess">Mess</option>
+                    <option value="Wi-Fi">Wi-Fi</option>
+                    <option value="Washroom">Washroom</option>
+                    <option value="Electricity">Electricity</option>
+                    <option value="Water">Water</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="complaint-description" class="form-label">Description</label>
+                  <textarea class="form-control" id="complaint-description" rows="4" required></textarea>
+                </div>
+                <div class="mb-3">
+                  <label for="complaint-image" class="form-label">Upload Image (Optional)</label>
+                  <input type="file" class="form-control" id="complaint-image" accept="image/*">
+                  <div class="preview mt-2 d-none" id="image-preview">
+                    <img src="#" alt="Preview" class="img-thumbnail" id="preview-image" style="max-height: 200px;">
+                    <button type="button" class="btn btn-sm btn-danger mt-2" id="remove-image">
+                      <i class="fas fa-times me-1"></i>Remove
+                    </button>
+                  </div>
+                </div>
+                <div class="d-grid gap-2">
+                  <button type="submit" class="btn btn-primary">Submit Complaint</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Complaint Details Modal -->
+    <div class="modal fade" id="complaintModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="complaintModalTitle">Complaint Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="complaintModalBody">
+            <!-- Content will be loaded here -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="d-none">
+      <h4 class="mb-4">Admin Dashboard</h4>
+      
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="card bg-primary text-white">
+            <div class="card-body">
+              <h6 class="card-title">Total Complaints</h6>
+              <h3 class="card-text" id="total-complaints">0</h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card bg-warning text-dark">
+            <div class="card-body">
+              <h6 class="card-title">Pending</h6>
+              <h3 class="card-text" id="pending-complaints">0</h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card bg-info text-white">
+            <div class="card-body">
+              <h6 class="card-title">In Progress</h6>
+              <h3 class="card-text" id="inprogress-complaints">0</h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card bg-success text-white">
+            <div class="card-body">
+              <h6 class="card-title">Resolved</h6>
+              <h3 class="card-text" id="resolved-complaints">0</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-md-8">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">Complaints by Category</h5>
+            </div>
+            <div class="card-body">
+              <canvas id="categoryChart" height="300"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">Status Distribution</h5>
+            </div>
+            <div class="card-body">
+              <canvas id="statusChart" height="300"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">All Complaints</h5>
+          <div>
+            <select class="form-select me-2 d-inline-block w-auto" id="filter-status">
+              <option value="all">All Status</option>
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Resolved">Resolved</option>
+            </select>
+            <select class="form-select d-inline-block w-auto" id="filter-category">
+              <option value="all">All Categories</option>
+              <option value="Hostel">Hostel</option>
+              <option value="Mess">Mess</option>
+              <option value="Wi-Fi">Wi-Fi</option>
+              <option value="Washroom">Washroom</option>
+              <option value="Electricity">Electricity</option>
+              <option value="Water">Water</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Student</th>
+                  <th>Category</th>
+                  <th>Description</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-complaints-table">
+                <!-- Complaints will be loaded here -->
+              </tbody>
+            </table>
+          </div>
+          <div class="d-flex justify-content-center mt-3">
+            <nav>
+              <ul class="pagination" id="admin-pagination">
+                <!-- Pagination will be added here -->
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Complaint Details Modal -->
+    <div class="modal fade" id="adminComplaintModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Manage Complaint</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="adminComplaintModalBody">
+            <!-- Content will be loaded here -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="save-complaint-status">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto" id="toast-title">Notification</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body" id="toast-message">
+        Hello, world! This is a toast message.
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
